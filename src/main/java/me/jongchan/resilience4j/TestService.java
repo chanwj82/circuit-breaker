@@ -1,10 +1,6 @@
 package me.jongchan.resilience4j;
 
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead.Type;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import java.io.IOException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
