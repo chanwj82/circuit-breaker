@@ -12,8 +12,13 @@ public class TestService {
   private static final String TEST_CIRCUIT_BREAKER = "testCircuitBreaker";
 
   @CircuitBreaker(name = TEST_CIRCUIT_BREAKER, fallbackMethod = "fallback")
-  public Mono<String> getHello() {
+  public Mono<String> getFailHello() {
     return Mono.error(new IOException());
+  }
+
+  @CircuitBreaker(name = TEST_CIRCUIT_BREAKER)
+  public Mono<String> getSuccessHello() {
+    return Mono.just("Hello");
   }
 
   /**

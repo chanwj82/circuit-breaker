@@ -1,6 +1,10 @@
+management.health.circuitbreakers.enabled: true
+management.endpoint.health.show-details: always
+
 resilience4j.circuitbreaker:
   configs:
     default:
+      registerHealthIndicator: true
       minimumNumberOfCalls: 5
       failureRateThreshold: 50
       recordExceptions:
