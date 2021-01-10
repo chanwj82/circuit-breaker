@@ -13,7 +13,7 @@ public class TestController {
   private TestService testService;
 
   @GetMapping("test")
-  public Mono<String> getHello() throws IOException {
+  public Mono<String> getHello() {
     return testService.getHello();
   }
 }
