@@ -1,4 +1,4 @@
-HELP.md
+Resilience4j/HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
