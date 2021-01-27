@@ -1,6 +1,5 @@
 package me.jongchan.resilience4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -8,8 +7,11 @@ import reactor.core.publisher.Mono;
 @RestController
 public class TestController {
 
-  @Autowired
-  private TestService testService;
+  private final TestService testService;
+
+  public TestController(TestService testService) {
+    this.testService = testService;
+  }
 
   @GetMapping("fail")
   public Mono<String> getFailHello() {
@@ -20,4 +22,10 @@ public class TestController {
   public Mono<String> getSuccessHello() {
     return testService.getSuccessHello();
   }
+
+  @GetMapping("data")
+  public Mono<String> getDataFromRemoteServer() {
+    return testService.getDataFromRemoteServer();
+  }
+
 }

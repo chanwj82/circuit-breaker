@@ -1,9 +1,17 @@
 package me.jongchan.resilience4j;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import java.io.IOException;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import java.util.Collections;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -11,31 +19,44 @@ public class TestService {
 
   private static final String TEST_CIRCUIT_BREAKER = "testCircuitBreaker";
 
+  @Bulkhead(name = TEST_CIRCUIT_BREAKER)
   @CircuitBreaker(name = TEST_CIRCUIT_BREAKER, fallbackMethod = "fallback")
   public Mono<String> getFailHello() {
-    return Mono.error(new IOException());
+    return Mono.error(new CustomException("CustomException"));
   }
 
-  @CircuitBreaker(name = TEST_CIRCUIT_BREAKER)
+  @RateLimiter(name = TEST_CIRCUIT_BREAKER)
+  @Bulkhead(name = TEST_CIRCUIT_BREAKER)
+  @CircuitBreaker(name = TEST_CIRCUIT_BREAKER, fallbackMethod = "fallback")
   public Mono<String> getSuccessHello() {
     return Mono.just("Hello");
   }
 
-  /**
-   * Before Circuit becomes open
-   * @param e
-   * @return
-   */
-  private Mono<String> fallback(IOException e) {
+  @TimeLimiter(name = TEST_CIRCUIT_BREAKER)
+  @Retry(name = TEST_CIRCUIT_BREAKER)
+  @CircuitBreaker(name = TEST_CIRCUIT_BREAKER, fallbackMethod = "fallback")
+  public Mono<String> getDataFromRemoteServer() {
+    WebClient webClient = WebClient
+        .builder()
+        .baseUrl("http://localhost:9090")
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .defaultUriVariables(Collections.singletonMap("url", "http://localhost:9090"))
+        .build();
+
+    webClient.get();
+
+    return webClient
+        .method(HttpMethod.GET)
+        .uri("/")
+        .retrieve()
+        .bodyToMono(String.class);
+  }
+
+  public Mono<String> fallback(CustomException e) {
     return Mono.just("fallback");
   }
 
-  /**
-   * When Circuit is open
-   * @param e
-   * @return
-   */
-  private Mono<String> fallback(CallNotPermittedException e) {
-    return Mono.just("CallNotPermittedException Working");
+  public Mono<String> fallback(CallNotPermittedException e) {
+    return Mono.just("CallNotPermittedException");
   }
 }
