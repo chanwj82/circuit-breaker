@@ -43,8 +43,6 @@ public class TestService {
         .defaultUriVariables(Collections.singletonMap("url", "http://localhost:9090"))
         .build();
 
-    webClient.get();
-
     return webClient
         .method(HttpMethod.GET)
         .uri("/")

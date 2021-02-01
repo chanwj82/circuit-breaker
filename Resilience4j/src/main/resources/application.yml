@@ -1,7 +1,35 @@
-management.health.circuitbreakers.enabled: true
-# actuator를 통해 circuitbraker 상태를 확인하기 위해 설정
-management.endpoint.health.show-details: always
-# actuator에서 디테일한 정보들을 확인하기 위해 설정
+spring:
+  application.name: resilience4j
+
+info:
+  name: ${spring.application.name}
+  description: resilience4j-jc
+  environment: ${spring.profiles.active}
+  version: 0.0.1
+
+management:
+  metrics:
+    tags:
+      server: ${spring.server.name}
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        resilience4j.circuitbreaker.calls: true
+  health:
+    circuitbreakers:
+      enabled: true
+      # actuator를 통해 circuitbraker 상태를 확인하기 위해 설정
+  endpoint:
+    health:
+      show-details: always
+      # actuator에서 디테일한 정보들을 확인하기 위해 설정
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    # 추가적인 actuator URL을 확인하기 위해 설정
+
 
 resilience4j.circuitbreaker:
   configs:
